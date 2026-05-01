@@ -63,6 +63,35 @@ exports.login = async (req, res, next) => {
   }
 };
 
+// @desc    Login/Sync Google user
+// @route   POST /api/v1/auth/google-sync
+// @access  Public
+exports.googleLogin = async (req, res, next) => {
+  try {
+    const { name, email, googleId } = req.body;
+
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // Create user without password (social only)
+      user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: 'social-login-' + Math.random().toString(36), // Dummy password
+          role: 'user',
+        },
+      });
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create token

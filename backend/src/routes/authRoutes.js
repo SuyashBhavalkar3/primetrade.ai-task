@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, getMe } = require('../controllers/authController');
+const { register, login, getMe, googleLogin } = require('../controllers/authController');
 const { protect } = require('../middlewares/auth');
 
 const router = express.Router();
@@ -49,6 +49,28 @@ router.post('/register', register);
  *         description: Login successful
  */
 router.post('/login', login);
+
+/**
+ * @swagger
+ * /api/v1/auth/google-sync:
+ *   post:
+ *     summary: Login or Register via Google (Social Sync)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email]
+ *             properties:
+ *               name: { type: string }
+ *               email: { type: string }
+ *     responses:
+ *       200:
+ *         description: Sync successful
+ */
+router.post('/google-sync', googleLogin);
 
 /**
  * @swagger
