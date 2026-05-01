@@ -4,3 +4,7 @@ backend/node_modules
 frontend/node_modules
 backend/.env
 frontend/.env
+*.sqlite
+*.sqlite-journal
+database.sqlite
+backend/database.sqlite
