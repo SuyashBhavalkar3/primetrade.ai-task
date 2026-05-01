@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
 interface Task {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   status: 'pending' | 'in-progress' | 'completed';
@@ -62,7 +62,7 @@ export default function DashboardPage() {
     e.preventDefault();
     try {
       if (currentTask) {
-        await api.put(`/tasks/${currentTask._id}`, formData);
+        await api.put(`/tasks/${currentTask.id}`, formData);
         toast.success('Task updated');
       } else {
         await api.post('/tasks', formData);
@@ -146,7 +146,7 @@ export default function DashboardPage() {
           <AnimatePresence>
             {tasks.map((task) => (
               <motion.div
-                key={task._id}
+                key={task.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                     <button onClick={() => openEditModal(task)} className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white">
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => deleteTask(task._id)} className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-400 hover:text-rose-400">
+                    <button onClick={() => deleteTask(task.id)} className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-400 hover:text-rose-400">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
