@@ -5,6 +5,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
 
+# Copy prisma schema first to generate client
+COPY prisma ./prisma/
+RUN npx prisma generate
+
 # Copy source code
 COPY . .
 
