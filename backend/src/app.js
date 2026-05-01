@@ -13,6 +13,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy for Railway/Proxies
+app.set('trust proxy', 1);
+
 // Body parser
 app.use(express.json());
 
