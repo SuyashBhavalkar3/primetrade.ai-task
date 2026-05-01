@@ -1,24 +1,15 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
+const { PrismaClient } = require('@prisma/client');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: process.env.DB_STORAGE || './database.sqlite',
-  logging: false,
-});
+const prisma = new PrismaClient();
 
 const connectDB = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('SQL Database Connected (SQLite)');
-    
-    // Sync models
-    await sequelize.sync({ alter: true });
-    console.log('Database models synced');
+    await prisma.$connect();
+    console.log('Prisma connected to PostgreSQL (Supabase)');
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(1);
   }
 };
 
-module.exports = { sequelize, connectDB };
+module.exports = { prisma, connectDB };

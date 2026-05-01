@@ -1,24 +1,29 @@
-const Task = require('../models/Task');
-const User = require('../models/User');
+const { prisma } = require('../config/db');
 
 // @desc    Get all tasks
 // @route   GET /api/v1/tasks
 // @access  Private
 exports.getTasks = async (req, res, next) => {
   try {
-    let options = {
-      where: {},
-      include: []
-    };
+    let tasks;
 
     // If admin, can see all tasks, otherwise only their own
     if (req.user.role === 'admin') {
-      options.include = [{ model: User, attributes: ['name', 'email'] }];
+      tasks = await prisma.task.findMany({
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
     } else {
-      options.where = { userId: req.user.id };
+      tasks = await prisma.task.findMany({
+        where: { userId: req.user.id },
+      });
     }
-
-    const tasks = await Task.findAll(options);
 
     res.status(200).json({
       success: true,
@@ -35,7 +40,9 @@ exports.getTasks = async (req, res, next) => {
 // @access  Private
 exports.getTask = async (req, res, next) => {
   try {
-    const task = await Task.findByPk(req.params.id);
+    const task = await prisma.task.findUnique({
+      where: { id: req.params.id },
+    });
 
     if (!task) {
       return res.status(404).json({ success: false, message: 'Task not found' });
@@ -60,10 +67,17 @@ exports.getTask = async (req, res, next) => {
 // @access  Private
 exports.createTask = async (req, res, next) => {
   try {
-    // Add userId to req.body
-    req.body.userId = req.user.id;
+    const { title, description, status, priority } = req.body;
 
-    const task = await Task.create(req.body);
+    const task = await prisma.task.create({
+      data: {
+        title,
+        description,
+        status,
+        priority,
+        userId: req.user.id,
+      },
+    });
 
     res.status(201).json({
       success: true,
@@ -79,7 +93,9 @@ exports.createTask = async (req, res, next) => {
 // @access  Private
 exports.updateTask = async (req, res, next) => {
   try {
-    let task = await Task.findByPk(req.params.id);
+    let task = await prisma.task.findUnique({
+      where: { id: req.params.id },
+    });
 
     if (!task) {
       return res.status(404).json({ success: false, message: 'Task not found' });
@@ -90,7 +106,10 @@ exports.updateTask = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to update this task' });
     }
 
-    await task.update(req.body);
+    task = await prisma.task.update({
+      where: { id: req.params.id },
+      data: req.body,
+    });
 
     res.status(200).json({
       success: true,
@@ -106,7 +125,9 @@ exports.updateTask = async (req, res, next) => {
 // @access  Private
 exports.deleteTask = async (req, res, next) => {
   try {
-    const task = await Task.findByPk(req.params.id);
+    const task = await prisma.task.findUnique({
+      where: { id: req.params.id },
+    });
 
     if (!task) {
       return res.status(404).json({ success: false, message: 'Task not found' });
@@ -117,7 +138,9 @@ exports.deleteTask = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to delete this task' });
     }
 
-    await task.destroy();
+    await prisma.task.delete({
+      where: { id: req.params.id },
+    });
 
     res.status(200).json({
       success: true,

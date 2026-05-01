@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { prisma } = require('../config/db');
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -21,7 +21,9 @@ exports.protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findByPk(decoded.id);
+    req.user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
 
     next();
   } catch (err) {

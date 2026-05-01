@@ -8,3 +8,5 @@ frontend/.env
 *.sqlite-journal
 database.sqlite
 backend/database.sqlite
+password.txt
+.DS_Store
