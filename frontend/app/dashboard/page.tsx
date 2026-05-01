@@ -93,7 +93,7 @@ export default function DashboardPage() {
     setCurrentTask(task);
     setFormData({
       title: task.title,
-      description: task.description,
+      description: task.description, 
       status: task.status,
       priority: task.priority
     });
